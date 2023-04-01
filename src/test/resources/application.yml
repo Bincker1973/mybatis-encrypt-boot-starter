@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost/test
+    username: postgres
+    password: 123456
+logging:
+  level:
+    cn.bincker.mybatis.plus.encrypt.entity: DEBUG

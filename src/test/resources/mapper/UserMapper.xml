@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.bincker.mybatis.plus.encrypt.mapper.UserMapper">
+    <select id="selectByIdentityCardNumber" resultType="cn.bincker.mybatis.plus.encrypt.entity.User">
+        select * from public.user where identity_card_number = #{user.identityCardNumber} limit 1
+    </select>
+</mapper>
