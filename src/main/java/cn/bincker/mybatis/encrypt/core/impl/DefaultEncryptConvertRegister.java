@@ -6,6 +6,7 @@ import cn.bincker.mybatis.encrypt.core.EncryptConverter;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class DefaultEncryptConvertRegister implements EncryptConvertRegister {
     private final Map<Class<?>, EncryptConverter<?>> converterMap = new HashMap<>();
@@ -26,8 +27,8 @@ public class DefaultEncryptConvertRegister implements EncryptConvertRegister {
     }
 
     @Override
-    public <T> EncryptConverter<T> getConverter(Class<T> clazz) {
+    public <T> Optional<EncryptConverter<T>> getConverter(Class<T> clazz) {
         //noinspection unchecked
-        return (EncryptConverter<T>) converterMap.get(clazz);
+        return Optional.ofNullable((EncryptConverter<T>) converterMap.get(clazz));
     }
 }

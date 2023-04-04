@@ -3,7 +3,9 @@ package cn.bincker.mybatis.encrypt.core.impl;
 import cn.bincker.mybatis.encrypt.core.Encryptor;
 import cn.bincker.mybatis.encrypt.exception.MybatisEncryptException;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,8 +25,8 @@ public class AesAndSha256Encryptor implements Encryptor {
         try {
             var cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
             cipher.init(Cipher.ENCRYPT_MODE, (Key) key);
-            return cipher.update(data);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
+            return cipher.doFinal(data);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
             throw new MybatisEncryptException(e);
         }
     }
@@ -49,8 +51,9 @@ public class AesAndSha256Encryptor implements Encryptor {
         try {
             var cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
             cipher.init(Cipher.DECRYPT_MODE, (Key) key);
-            return cipher.update(data);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
+            return cipher.doFinal(data);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException |
+                 BadPaddingException e) {
             throw new MybatisEncryptException(e);
         }
     }

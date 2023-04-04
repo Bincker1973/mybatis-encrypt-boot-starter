@@ -2,6 +2,7 @@ package cn.bincker.mybatis.encrypt.wrapper;
 
 import cn.bincker.mybatis.encrypt.annotation.Encrypt;
 import cn.bincker.mybatis.encrypt.core.EncryptConvertRegister;
+import cn.bincker.mybatis.encrypt.core.EncryptExecutor;
 import cn.bincker.mybatis.encrypt.core.Encryptor;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.wrapper.ObjectWrapper;
@@ -13,8 +14,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class EncryptObjectWrapperFactory implements ObjectWrapperFactory {
     private final Map<Class<?>, Boolean> encryptClassCacheMap = new ConcurrentHashMap<>();
-    private final Encryptor encryptor;
-    private final EncryptConvertRegister encryptConvertRegister;
+    private final EncryptExecutor encryptExecutor;
+
+    public EncryptObjectWrapperFactory(EncryptExecutor encryptor) {
+        this.encryptExecutor = encryptor;
+    }
+
     @Override
     public boolean hasWrapperFor(Object object) {
         if (object == null) return false;

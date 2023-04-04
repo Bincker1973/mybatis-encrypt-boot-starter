@@ -1,15 +1,14 @@
 package cn.bincker.mybatis.encrypt;
 
-import cn.bincker.mybatis.encrypt.core.EncryptConvertRegister;
-import cn.bincker.mybatis.encrypt.core.EncryptKeyProvider;
-import cn.bincker.mybatis.encrypt.core.EncryptSaltProvider;
-import cn.bincker.mybatis.encrypt.core.Encryptor;
+import cn.bincker.mybatis.encrypt.core.*;
 import cn.bincker.mybatis.encrypt.core.impl.AesAndSha256Encryptor;
 import cn.bincker.mybatis.encrypt.core.impl.DefaultEncryptConvertRegister;
+import cn.bincker.mybatis.encrypt.core.impl.DefaultEncryptExecutor;
+import cn.bincker.mybatis.encrypt.core.impl.WaitDecryptGetterInterceptor;
 import cn.bincker.mybatis.encrypt.wrapper.EncryptObjectWrapperFactory;
-import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.boot.autoconfigure.ConfigurationCustomizer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +19,7 @@ import javax.crypto.spec.SecretKeySpec;
 @Configuration
 @EnableConfigurationProperties(MybatisEncryptProperties.class)
 @Slf4j
-public class MybatisEncryptAutoConfiguration implements ConfigurationCustomizer, com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer {
+public class MybatisEncryptAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(EncryptConvertRegister.class)
     public EncryptConvertRegister defaultEncryptConvertRegister(){
@@ -38,7 +37,7 @@ public class MybatisEncryptAutoConfiguration implements ConfigurationCustomizer,
     public EncryptKeyProvider temporaryKeyProvider(){
         log.warn("您尚未提供EncryptKeyProvider Bean，加密的数据并不安全！");
         log.warn("You have not provided an EncryptKeyProvider bean, the encrypted data is not secure!");
-        return (clazz, fieldName) -> new SecretKeySpec("bincker".getBytes(), "AES");
+        return (clazz, fieldName) -> new SecretKeySpec("hello_bincker_12".getBytes(), "AES");
     }
 
     @Bean
@@ -49,13 +48,25 @@ public class MybatisEncryptAutoConfiguration implements ConfigurationCustomizer,
         return (clazz, fieldName) -> "bincker".getBytes();
     }
 
-    @Override
-    public void customize(org.apache.ibatis.session.Configuration configuration) {
-        configuration.setObjectWrapperFactory(new EncryptObjectWrapperFactory());
+    @Bean
+    public DefaultEncryptExecutor defaultEncryptExecutor(Encryptor encryptor, EncryptConvertRegister convertRegister, EncryptKeyProvider encryptKeyProvider){
+        return new DefaultEncryptExecutor(encryptor, convertRegister, encryptKeyProvider);
     }
 
-    @Override
-    public void customize(MybatisConfiguration configuration) {
-        configuration.setObjectWrapperFactory(new EncryptObjectWrapperFactory());
+    @Bean
+    public ConfigurationCustomizer encryptMybatisCustomizer(EncryptExecutor encryptExecutor){
+        return configuration -> {
+            configuration.setObjectWrapperFactory(new EncryptObjectWrapperFactory(encryptExecutor));
+            configuration.setObjectFactory(new EncryptObjectFactory(new WaitDecryptGetterInterceptor(encryptExecutor)));
+        };
+    }
+
+    @Bean
+    @ConditionalOnClass(com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer.class)
+    public com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer encryptMybatisPlusCustomizer(EncryptExecutor encryptExecutor){
+        return configuration -> {
+            configuration.setObjectWrapperFactory(new EncryptObjectWrapperFactory(encryptExecutor));
+            configuration.setObjectFactory(new EncryptObjectFactory(new WaitDecryptGetterInterceptor(encryptExecutor)));
+        };
     }
 }

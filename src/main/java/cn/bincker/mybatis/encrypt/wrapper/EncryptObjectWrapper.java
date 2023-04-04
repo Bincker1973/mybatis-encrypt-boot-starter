@@ -29,7 +29,7 @@ public class EncryptObjectWrapper extends BaseWrapper {
             Object collection = resolveCollection(prop, object);
             return getCollectionValue(prop, collection);
         } else if(encryptExecutor.isEncryptField(object.getClass(), prop.getName())){
-            return encryptExecutor.encrypt(object.getClass(), prop.getName(), getBeanProperty(prop, object));
+            return encryptExecutor.encrypt(metaClass, object.getClass(), prop.getName(), getBeanProperty(prop, object));
         } else {
             return getBeanProperty(prop, object);
         }
@@ -44,7 +44,7 @@ public class EncryptObjectWrapper extends BaseWrapper {
             if (value.getClass() != byte[].class){
                 throw new MybatisEncryptException("invalid decrypt data type: " + value.getClass());
             }
-            encryptExecutor.putDecryptTask(object, prop.getName(), (byte[]) value);
+            encryptExecutor.putDecryptTask(metaClass, object, prop.getName(), (byte[]) value);
         } else {
             setBeanProperty(prop, object, value);
         }
