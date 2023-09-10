@@ -23,7 +23,7 @@ public class DefaultEncryptExecutor implements EncryptExecutor {
         this.encryptConvertRegister = encryptConvertRegister;
         this.keyProvider = keyProvider;
         encryptPropertyCache = new ConcurrentHashMap<>();
-        executor = Executors.newCachedThreadPool();
+        executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
     @Override
