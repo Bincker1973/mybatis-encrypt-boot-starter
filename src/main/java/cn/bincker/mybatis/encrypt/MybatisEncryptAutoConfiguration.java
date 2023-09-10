@@ -4,12 +4,15 @@ import cn.bincker.mybatis.encrypt.core.*;
 import cn.bincker.mybatis.encrypt.core.impl.AesAndSha256Encryptor;
 import cn.bincker.mybatis.encrypt.core.impl.DefaultEncryptConvertRegister;
 import cn.bincker.mybatis.encrypt.core.impl.DefaultEncryptExecutor;
-import cn.bincker.mybatis.encrypt.core.impl.WaitDecryptGetterInterceptor;
+import cn.bincker.mybatis.encrypt.reflection.EncryptReflectorFactory;
+import cn.bincker.mybatis.encrypt.reflection.factory.EncryptObjectFactory;
+import cn.bincker.mybatis.encrypt.type.EncryptTypeHandlerConfigurator;
 import cn.bincker.mybatis.encrypt.wrapper.EncryptObjectWrapperFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.boot.autoconfigure.ConfigurationCustomizer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,19 +57,21 @@ public class MybatisEncryptAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingClass("com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer")
     public ConfigurationCustomizer encryptMybatisCustomizer(EncryptExecutor encryptExecutor){
-        return configuration -> {
-            configuration.setObjectWrapperFactory(new EncryptObjectWrapperFactory(encryptExecutor));
-            configuration.setObjectFactory(new EncryptObjectFactory(new WaitDecryptGetterInterceptor(encryptExecutor)));
-        };
+        return configuration -> configure(configuration, encryptExecutor);
     }
 
     @Bean
     @ConditionalOnClass(com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer.class)
     public com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer encryptMybatisPlusCustomizer(EncryptExecutor encryptExecutor){
-        return configuration -> {
-            configuration.setObjectWrapperFactory(new EncryptObjectWrapperFactory(encryptExecutor));
-            configuration.setObjectFactory(new EncryptObjectFactory(new WaitDecryptGetterInterceptor(encryptExecutor)));
-        };
+        return configuration -> configure(configuration, encryptExecutor);
+    }
+
+    private void configure(org.apache.ibatis.session.Configuration configuration, EncryptExecutor encryptExecutor){
+        configuration.setObjectWrapperFactory(new EncryptObjectWrapperFactory(encryptExecutor));
+        configuration.setObjectFactory(new EncryptObjectFactory());
+        configuration.setReflectorFactory(new EncryptReflectorFactory());
+        EncryptTypeHandlerConfigurator.configure(configuration);
     }
 }

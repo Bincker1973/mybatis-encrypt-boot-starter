@@ -1,52 +1,41 @@
 package cn.bincker.mybatis.plus.encrypt;
 
-import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
+import cn.bincker.mybatis.encrypt.reflection.ReflectionUtils;
+import cn.bincker.mybatis.encrypt.reflection.factory.interceptor.EncryptEntity;
+import cn.bincker.mybatis.encrypt.reflection.factory.interceptor.SetEncryptFutureInterceptor;
+import cn.bincker.mybatis.encrypt.reflection.factory.interceptor.WaitDecryptGetterInterceptor;
+import cn.bincker.mybatis.plus.encrypt.entity.User;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.MethodDelegation;
-import net.bytebuddy.implementation.bind.annotation.AllArguments;
-import net.bytebuddy.implementation.bind.annotation.Origin;
-import net.bytebuddy.implementation.bind.annotation.RuntimeType;
-import net.bytebuddy.implementation.bind.annotation.SuperCall;
 import net.bytebuddy.matcher.ElementMatchers;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.concurrent.Callable;
+import java.lang.reflect.Modifier;
+import java.util.Map;
+import java.util.concurrent.Future;
 
 public class ByteBuddyTest {
 
-    public void say(){
-        System.out.println("hello world");
-    }
-
     @Test
-    void test() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        var foo = new ByteBuddy()
-                .subclass(SimpleService.class)
-                .method(ElementMatchers.named("getValue"))
-                .intercept(MethodDelegation.to(new TestInterceptor()))
-                .make()
-                .load(SimpleService.class.getClassLoader())
-                .getLoaded()
-                .newInstance();
-        System.out.println(foo.getValue());
-    }
-
-    public static class TestInterceptor {
-        @RuntimeType
-        public Object intercept(@AllArguments Object[] args, @SuperCall Callable<Object> callable) throws Exception {
-            System.out.println("called");
-            return callable.call() + "--hel";
+    void test() throws InstantiationException, IllegalAccessException, NoSuchMethodException {
+        var builder = new ByteBuddy().subclass(User.class);
+        try {
+            builder = builder.implement(EncryptEntity.class)
+                    .defineField(SetEncryptFutureInterceptor.encryptFutureFieldName, Map.class, Modifier.PRIVATE)
+                    .method(ElementMatchers.is(EncryptEntity.class.getMethod("$setDecryptFuture", Method.class, Future.class)))
+                    .intercept(MethodDelegation.to(SetEncryptFutureInterceptor.class));
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
         }
-    }
-
-    public static class SimpleService {
-        public String getValue() {
-            return "hello world";
+        var properties = ReflectionUtils.getEncryptProperties(User.class).values();
+        for (var property : properties) {
+            builder = builder.method(ElementMatchers.is(property.getter()))
+                    .intercept(MethodDelegation.to(WaitDecryptGetterInterceptor.class));
         }
+        //noinspection deprecation
+        var foo = builder.make().load(User.class.getClassLoader()).getLoaded().newInstance();
+        ((EncryptEntity) foo).$setDecryptFuture(User.class.getMethod("getPassword"), null);
+        System.out.println(foo.getPassword());
     }
-
 }

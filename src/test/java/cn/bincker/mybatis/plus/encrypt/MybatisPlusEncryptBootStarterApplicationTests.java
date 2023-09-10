@@ -44,7 +44,7 @@ class MybatisPlusEncryptBootStarterApplicationTests {
                     user.getRealname(),
                     user.getIdentityCardNumber(),
                     timeFormatter.format(user.getCreatedTime()),
-                    timeFormatter.format(user.getLatestModifiedTime())
+                    timeFormatter.format(user.getLastModifiedTime())
             );
         }
     }

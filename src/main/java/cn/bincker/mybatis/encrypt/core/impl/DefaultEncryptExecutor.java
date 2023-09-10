@@ -1,21 +1,20 @@
 package cn.bincker.mybatis.encrypt.core.impl;
 
-import cn.bincker.mybatis.encrypt.annotation.Encrypt;
-import cn.bincker.mybatis.encrypt.annotation.IntegrityCheckFor;
 import cn.bincker.mybatis.encrypt.core.*;
+import cn.bincker.mybatis.encrypt.entity.EncryptProperty;
 import cn.bincker.mybatis.encrypt.exception.MybatisEncryptException;
+import cn.bincker.mybatis.encrypt.reflection.ReflectionUtils;
 import org.apache.ibatis.reflection.MetaClass;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.*;
 
 public class DefaultEncryptExecutor implements EncryptExecutor {
     private final Encryptor encryptor;
     private final EncryptConvertRegister encryptConvertRegister;
-    private final Map<FieldKey, EncryptFieldInfo> encryptFieldCache;
+    private final Map<Class<?>, Map<String, EncryptProperty>> encryptPropertyCache;
     private final ExecutorService executor;
     private final EncryptKeyProvider keyProvider;
 
@@ -23,22 +22,29 @@ public class DefaultEncryptExecutor implements EncryptExecutor {
         this.encryptor = encryptor;
         this.encryptConvertRegister = encryptConvertRegister;
         this.keyProvider = keyProvider;
-        encryptFieldCache = new ConcurrentHashMap<>();
-        executor = Executors.newWorkStealingPool();
+        encryptPropertyCache = new ConcurrentHashMap<>();
+        executor = Executors.newCachedThreadPool();
     }
 
     @Override
     public boolean isEncryptField(Class<?> clazz, String fieldName) {
-        return encryptFieldCache.computeIfAbsent(new FieldKey(clazz, fieldName), fieldKey -> {
-            var info = new EncryptFieldInfo(fieldKey.clazz, fieldKey.fieldName);
-            if (info.annotation == null) return null;
-            return info;
-        }) != null;
+        return encryptPropertyCache.computeIfAbsent(clazz, ReflectionUtils::getEncryptProperties).containsKey(fieldName);
+    }
+
+    @Override
+    public Optional<EncryptProperty> getEncryptField(Class<?> clazz, String fieldName) {
+        return Optional.ofNullable(encryptPropertyCache.computeIfAbsent(clazz, ReflectionUtils::getEncryptProperties).get(fieldName));
+    }
+
+    @Override
+    public boolean hasEncryptField(Class<?> clazz) {
+        return !encryptPropertyCache.computeIfAbsent(clazz, ReflectionUtils::getEncryptProperties).isEmpty();
     }
 
     @Override
     public byte[] encrypt(MetaClass metaClass, Class<?> clazz, String fieldName, Object value) {
-        var type = metaClass.getGetterType(fieldName);
+        if (value == null) return null;
+        var type = value.getClass();
         byte[] rawData;
         if (type != byte[].class){
             //noinspection unchecked
@@ -57,14 +63,13 @@ public class DefaultEncryptExecutor implements EncryptExecutor {
     }
 
     @Override
-    public void decrypt(MetaClass metaClass, Object target, String fieldName, byte[] data) {
-        var decryptedData = encryptor.decrypt(data, keyProvider.getKey(target.getClass(), fieldName));
-        Class<?> type;
-        try {
-            type = target.getClass().getDeclaredField(fieldName).getType();
-        } catch (NoSuchFieldException e) {
-            throw new MybatisEncryptException(e);
-        }
+    public Object decrypt(MetaClass metaClass, Object target, String fieldName, byte[] data) {
+        var cls = target.getClass();
+        var decryptedData = encryptor.decrypt(data, keyProvider.getKey(cls, fieldName));
+        var propertyOptional = getEncryptField(cls, fieldName);
+        if (propertyOptional.isEmpty()) return null;
+        var property = propertyOptional.get();
+        Class<?> type = property.getter().getReturnType();
         Object result;
         if (type == byte[].class){
             result = decryptedData;
@@ -79,57 +84,11 @@ public class DefaultEncryptExecutor implements EncryptExecutor {
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new MybatisEncryptException(e);
         }
+        return result;
     }
 
     @Override
     public Future<?> putDecryptTask(MetaClass metaClass, Object target, String fieldName, byte[] data) {
         return executor.submit(()->this.decrypt(metaClass, target, fieldName, data));
-    }
-
-    private record FieldKey(Class<?> clazz, String fieldName) {
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (obj == null || obj.getClass() != getClass()) return false;
-            return Objects.equals(clazz, ((FieldKey) obj).clazz) && Objects.equals(fieldName, ((FieldKey) obj).fieldName);
-        }
-    }
-
-    private static class EncryptFieldInfo{
-        private final Class<?> clazz;
-        private final String fieldName;
-        private final Field field;
-        private final Encrypt annotation;
-        private final Field integrityCheckField;
-        private final IntegrityCheckFor integrityCheckAnnotation;
-
-        public EncryptFieldInfo(Class<?> clazz, String fieldName) {
-            this.clazz = clazz;
-            this.fieldName = fieldName;
-            try {
-                field = clazz.getDeclaredField(fieldName);
-            } catch (NoSuchFieldException e) {
-                throw new MybatisEncryptException("not found field: " + fieldName, e);
-            }
-            annotation = field.getAnnotation(Encrypt.class);
-            if (annotation == null){
-                integrityCheckField = null;
-                integrityCheckAnnotation = null;
-                return;
-            }
-            var fields = clazz.getDeclaredFields();
-            Field foundField = null;
-            IntegrityCheckFor foundAnnotation = null;
-            for (var f : fields) {
-                var a = f.getAnnotation(IntegrityCheckFor.class);
-                if (a != null && a.name().equals(fieldName)){
-                    foundField = f;
-                    foundAnnotation = a;
-                    break;
-                }
-            }
-            integrityCheckField = foundField;
-            integrityCheckAnnotation = foundAnnotation;
-        }
     }
 }

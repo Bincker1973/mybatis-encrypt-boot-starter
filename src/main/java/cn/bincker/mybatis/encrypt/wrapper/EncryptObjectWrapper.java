@@ -1,7 +1,9 @@
 package cn.bincker.mybatis.encrypt.wrapper;
 
 import cn.bincker.mybatis.encrypt.core.EncryptExecutor;
+import cn.bincker.mybatis.encrypt.entity.EncryptProperty;
 import cn.bincker.mybatis.encrypt.exception.MybatisEncryptException;
+import cn.bincker.mybatis.encrypt.reflection.factory.interceptor.EncryptEntity;
 import org.apache.ibatis.reflection.*;
 import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.invoker.Invoker;
@@ -9,6 +11,7 @@ import org.apache.ibatis.reflection.property.PropertyTokenizer;
 import org.apache.ibatis.reflection.wrapper.BaseWrapper;
 
 import java.util.List;
+import java.util.Optional;
 
 public class EncryptObjectWrapper extends BaseWrapper {
 
@@ -37,14 +40,18 @@ public class EncryptObjectWrapper extends BaseWrapper {
 
     @Override
     public void set(PropertyTokenizer prop, Object value) {
+        Optional<EncryptProperty> encryptPropertyOptional;
         if (prop.getIndex() != null) {
             Object collection = resolveCollection(prop, object);
             setCollectionValue(prop, collection, value);
-        } else if(encryptExecutor.isEncryptField(object.getClass(), prop.getName())){
+        } else if((encryptPropertyOptional = encryptExecutor.getEncryptField(object.getClass(), prop.getName())).isPresent()){
             if (value.getClass() != byte[].class){
                 throw new MybatisEncryptException("invalid decrypt data type: " + value.getClass());
             }
-            encryptExecutor.putDecryptTask(metaClass, object, prop.getName(), (byte[]) value);
+            ((EncryptEntity) object).$setDecryptFuture(
+                    encryptPropertyOptional.get().getter(),
+                    encryptExecutor.putDecryptTask(metaClass, object, prop.getName(), (byte[]) value)
+            );
         } else {
             setBeanProperty(prop, object, value);
         }
@@ -142,7 +149,7 @@ public class EncryptObjectWrapper extends BaseWrapper {
             metaValue = MetaObject.forObject(newObject, metaObject.getObjectFactory(), metaObject.getObjectWrapperFactory(), metaObject.getReflectorFactory());
             set(prop, newObject);
         } catch (Exception e) {
-            throw new ReflectionException("Cannot set value of property '" + name + "' because '" + name + "' is null and cannot be instantiated on instance of " + type.getName() + ". Cause:" + e.toString(), e);
+            throw new ReflectionException("Cannot set value of property '" + name + "' because '" + name + "' is null and cannot be instantiated on instance of " + type.getName(), e);
         }
         return metaValue;
     }
@@ -158,7 +165,7 @@ public class EncryptObjectWrapper extends BaseWrapper {
         } catch (RuntimeException e) {
             throw e;
         } catch (Throwable t) {
-            throw new ReflectionException("Could not get property '" + prop.getName() + "' from " + object.getClass() + ".  Cause: " + t.toString(), t);
+            throw new ReflectionException("Could not get property '" + prop.getName() + "' from " + object.getClass(), t);
         }
     }
 
@@ -172,7 +179,7 @@ public class EncryptObjectWrapper extends BaseWrapper {
                 throw ExceptionUtil.unwrapThrowable(t);
             }
         } catch (Throwable t) {
-            throw new ReflectionException("Could not set property '" + prop.getName() + "' of '" + object.getClass() + "' with value '" + value + "' Cause: " + t.toString(), t);
+            throw new ReflectionException("Could not set property '" + prop.getName() + "' of '" + object.getClass() + "' with value '" + value, t);
         }
     }
 
