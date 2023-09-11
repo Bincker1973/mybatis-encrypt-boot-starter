@@ -1,4 +1,4 @@
-package cn.bincker.mybatis.encrypt.core;
+package cn.bincker.mybatis.encrypt.converter;
 
 public interface EncryptConverter<T> {
     T convert(byte[] data);

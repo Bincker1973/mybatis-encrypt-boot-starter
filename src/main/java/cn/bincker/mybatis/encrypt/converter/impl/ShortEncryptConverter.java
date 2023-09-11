@@ -1,24 +1,24 @@
-package cn.bincker.mybatis.encrypt.core.impl;
+package cn.bincker.mybatis.encrypt.converter.impl;
 
-import cn.bincker.mybatis.encrypt.core.EncryptConverter;
 import cn.bincker.mybatis.encrypt.exception.InvalidDataException;
 
-public class ShortEncryptConverter implements EncryptConverter<Short> {
+public class ShortEncryptConverter extends BaseEncryptConverter<Short> {
     @Override
-    public Short convert(byte[] data) {
+    public Short convertNonNull(byte[] data) {
         if (data.length != Short.BYTES) throw new InvalidDataException("long need " + Short.BYTES + " bytes but got " + data.length);
         short result = 0;
         for (int i = 0; i < Short.BYTES; i++) {
-            result |= data[i] << (Short.BYTES - i - 1);
+            result = (short) (result << 8 | data[i] & 0xff);
         }
         return result;
     }
 
     @Override
-    public byte[] convert(Short object) {
+    public byte[] convertNonNull(Short object) {
         byte[] result = new byte[Short.BYTES];
         for (int i = 0; i < Short.BYTES; i++) {
-            result[i] = (byte) (object >> (Short.BYTES - i - 1) & 0xff);
+            result[Short.BYTES - i - 1] = (byte) (object & 0xff);
+            object = (short) (object >> 8);
         }
         return result;
     }

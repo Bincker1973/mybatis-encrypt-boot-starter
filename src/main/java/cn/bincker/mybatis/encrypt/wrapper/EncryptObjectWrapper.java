@@ -44,13 +44,17 @@ public class EncryptObjectWrapper extends BaseWrapper {
         if (prop.getIndex() != null) {
             Object collection = resolveCollection(prop, object);
             setCollectionValue(prop, collection, value);
-        } else if((encryptPropertyOptional = encryptExecutor.getEncryptField(object.getClass(), prop.getName())).isPresent()){
-            if (value.getClass() != byte[].class){
+        } else if((encryptPropertyOptional = encryptExecutor.getEncryptField(object.getClass(), prop.getName())).isPresent() && value != null){
+            byte[] encryptedData;
+            var cls = value.getClass();
+            if (cls == byte[].class){
+                encryptedData = (byte[]) value;
+            }else{
                 throw new MybatisEncryptException("invalid decrypt data type: " + value.getClass());
             }
             ((EncryptEntity) object).$setDecryptFuture(
                     encryptPropertyOptional.get().getter(),
-                    encryptExecutor.putDecryptTask(metaClass, object, prop.getName(), (byte[]) value)
+                    encryptExecutor.putDecryptTask(metaClass, object, prop.getName(), encryptedData)
             );
         } else {
             setBeanProperty(prop, object, value);

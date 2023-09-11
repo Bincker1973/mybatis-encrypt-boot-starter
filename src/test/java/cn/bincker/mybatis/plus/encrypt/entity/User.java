@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import org.apache.ibatis.type.ByteArrayTypeHandler;
 
 import java.util.Date;
 
@@ -18,24 +17,16 @@ public class User{
 
     private String username;
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     @Encrypt
-    @TableField(typeHandler = ByteArrayTypeHandler.class)
     private String password;
 
     @Encrypt
-    @TableField(typeHandler = ByteArrayTypeHandler.class)
     private String phone;
 
     @Encrypt
-    @TableField(typeHandler = ByteArrayTypeHandler.class)
     private String realname;
 
     @Encrypt
-    @TableField(typeHandler = ByteArrayTypeHandler.class)
     private String identityCardNumber;
 
     @TableField(fill = FieldFill.INSERT)

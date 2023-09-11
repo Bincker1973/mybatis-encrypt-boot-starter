@@ -1,25 +1,25 @@
-package cn.bincker.mybatis.encrypt.core.impl;
+package cn.bincker.mybatis.encrypt.converter.impl;
 
-import cn.bincker.mybatis.encrypt.core.EncryptConverter;
 import cn.bincker.mybatis.encrypt.exception.InvalidDataException;
 
-public class FloatEncryptConverter implements EncryptConverter<Float> {
+public class FloatEncryptConverter extends BaseEncryptConverter<Float> {
     @Override
-    public Float convert(byte[] data) {
+    public Float convertNonNull(byte[] data) {
         if (data.length != Float.BYTES) throw new InvalidDataException("long need " + Float.BYTES + " bytes but got " + data.length);
         int result = 0;
         for (int i = 0; i < Float.BYTES; i++) {
-            result |= data[i] << (Float.BYTES - i - 1);
+            result = result << 8 | data[i] & 0xff;
         }
         return Float.intBitsToFloat(result);
     }
 
     @Override
-    public byte[] convert(Float object) {
+    public byte[] convertNonNull(Float object) {
         int integer = Float.floatToIntBits(object);
         byte[] result = new byte[Float.BYTES];
         for (int i = 0; i < Float.BYTES; i++) {
-            result[i] = (byte) (integer >> (Float.BYTES - i - 1) & 0xff);
+            result[Float.BYTES - i - 1] = (byte) (integer & 0xff);
+            integer >>= 8;
         }
         return result;
     }

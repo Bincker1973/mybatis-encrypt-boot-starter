@@ -1,8 +1,9 @@
 package cn.bincker.mybatis.encrypt;
 
+import cn.bincker.mybatis.encrypt.converter.EncryptConvertRegister;
 import cn.bincker.mybatis.encrypt.core.*;
 import cn.bincker.mybatis.encrypt.core.impl.AesAndSha256Encryptor;
-import cn.bincker.mybatis.encrypt.core.impl.DefaultEncryptConvertRegister;
+import cn.bincker.mybatis.encrypt.converter.impl.DefaultEncryptConvertRegister;
 import cn.bincker.mybatis.encrypt.core.impl.DefaultEncryptExecutor;
 import cn.bincker.mybatis.encrypt.reflection.EncryptReflectorFactory;
 import cn.bincker.mybatis.encrypt.reflection.factory.EncryptObjectFactory;

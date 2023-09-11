@@ -3,7 +3,6 @@ package cn.bincker.mybatis.encrypt.type;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 
-import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.*;
@@ -33,7 +32,7 @@ public class EncryptTypeHandlerConfigurator {
         registry.register(Double.class, JdbcType.BINARY, new EncryptByteArrayTypeHandler<>());
         registry.register(double.class, JdbcType.BINARY, new EncryptByteArrayTypeHandler<>());
 
-        registry.register(Reader.class, JdbcType.BINARY, new EncryptByteArrayTypeHandler<>());
+//        registry.register(Reader.class, JdbcType.BINARY, new EncryptByteArrayTypeHandler<>());
         registry.register(String.class, JdbcType.BINARY, new EncryptByteArrayTypeHandler<>());
 
 

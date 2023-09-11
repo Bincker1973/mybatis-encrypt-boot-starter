@@ -17,20 +17,6 @@ class MybatisPlusEncryptBootStarterApplicationTests {
 
     @Test
     @Transactional
-    void insert() {
-        for (int i = 0; i < 10; i++) {
-            var user = new User();
-            user.setUsername("user" + (i + 1));
-            user.setPhone("123456789");
-            user.setPassword("123456");
-            user.setRealname("bincker");
-            user.setIdentityCardNumber("000000000000000000");
-            userMapper.insert(user);
-        }
-    }
-
-    @Test
-    @Transactional
     void list() {
         var userList = userMapper.selectList(Wrappers.emptyWrapper());
         var timeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

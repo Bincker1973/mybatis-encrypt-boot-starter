@@ -1,5 +1,7 @@
 package cn.bincker.mybatis.encrypt.core.impl;
 
+import cn.bincker.mybatis.encrypt.converter.EncryptConvertRegister;
+import cn.bincker.mybatis.encrypt.converter.EncryptConverter;
 import cn.bincker.mybatis.encrypt.core.*;
 import cn.bincker.mybatis.encrypt.entity.EncryptProperty;
 import cn.bincker.mybatis.encrypt.exception.MybatisEncryptException;
@@ -64,6 +66,7 @@ public class DefaultEncryptExecutor implements EncryptExecutor {
 
     @Override
     public Object decrypt(MetaClass metaClass, Object target, String fieldName, byte[] data) {
+        if (data == null) return null;
         var cls = target.getClass();
         var decryptedData = encryptor.decrypt(data, keyProvider.getKey(cls, fieldName));
         var propertyOptional = getEncryptField(cls, fieldName);
