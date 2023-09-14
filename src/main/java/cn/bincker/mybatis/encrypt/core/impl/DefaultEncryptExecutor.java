@@ -29,6 +29,21 @@ public class DefaultEncryptExecutor implements EncryptExecutor {
     }
 
     @Override
+    public Encryptor getEncryptor() {
+        return encryptor;
+    }
+
+    @Override
+    public EncryptKeyProvider getKeyProvider() {
+        return keyProvider;
+    }
+
+    @Override
+    public EncryptConvertRegister getConverterRegister() {
+        return encryptConvertRegister;
+    }
+
+    @Override
     public boolean isEncryptField(Class<?> clazz, String fieldName) {
         return encryptPropertyCache.computeIfAbsent(clazz, ReflectionUtils::getEncryptProperties).containsKey(fieldName);
     }
@@ -52,7 +67,7 @@ public class DefaultEncryptExecutor implements EncryptExecutor {
             //noinspection unchecked
             var converter = (EncryptConverter<Object>) encryptConvertRegister.getConverter(type)
                     .orElseThrow(()->new MybatisEncryptException("not found converter: type = " + type));
-            rawData = converter.convert(value);
+            rawData = converter.toBinary(value);
         }else {
             rawData = (byte[]) value;
         }
@@ -79,7 +94,7 @@ public class DefaultEncryptExecutor implements EncryptExecutor {
         }else{
             result = encryptConvertRegister.getConverter(type)
                     .orElseThrow(()->new MybatisEncryptException("not found converter: type = " + type))
-                    .convert(decryptedData);
+                    .toObject(decryptedData);
         }
         var invoker = metaClass.getSetInvoker(fieldName);
         try {

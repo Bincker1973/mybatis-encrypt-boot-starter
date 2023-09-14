@@ -1,5 +1,7 @@
 package cn.bincker.mybatis.encrypt.type;
 
+import cn.bincker.mybatis.encrypt.core.EncryptExecutor;
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 
@@ -9,7 +11,7 @@ import java.time.*;
 import java.util.Date;
 
 public class EncryptTypeHandlerConfigurator {
-    public static void configure(Configuration configuration){
+    public static void configure(Configuration configuration, EncryptExecutor encryptExecutor){
         var registry = configuration.getTypeHandlerRegistry();
         registry.register(Boolean.class, JdbcType.BINARY, new EncryptByteArrayTypeHandler<>());
         registry.register(boolean.class, JdbcType.BINARY, new EncryptByteArrayTypeHandler<>());
@@ -62,5 +64,12 @@ public class EncryptTypeHandlerConfigurator {
         registry.register(Month.class, JdbcType.BINARY, new EncryptByteArrayTypeHandler<>());
         registry.register(Year.class, JdbcType.BINARY, new EncryptByteArrayTypeHandler<>());
         registry.register(YearMonth.class, JdbcType.BINARY, new EncryptByteArrayTypeHandler<>());
+
+        registry.register(EncryptParam.class, new EncryptParamTypeHandler<>(encryptExecutor));
+    }
+
+    public static void configureWithMybatisPlus(MybatisConfiguration configuration, EncryptExecutor encryptExecutor){
+        var registry = configuration.getTypeHandlerRegistry();
+        registry.register(LambdaEncryptParam.class, new EncryptParamTypeHandler<LambdaEncryptParam<?>>(encryptExecutor));
     }
 }

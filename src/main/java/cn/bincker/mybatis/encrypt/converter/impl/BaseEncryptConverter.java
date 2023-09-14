@@ -4,18 +4,18 @@ import cn.bincker.mybatis.encrypt.converter.EncryptConverter;
 
 public abstract class BaseEncryptConverter<T> implements EncryptConverter<T> {
     @Override
-    public T convert(byte[] data) {
+    public T toObject(byte[] data) {
         if (data == null) return null;
         return convertNonNull(data);
     }
 
     @Override
-    public byte[] convert(T object) {
+    public byte[] toBinary(T object) {
         if (object == null) return null;
         return convertNonNull(object);
     }
 
-    public abstract T convertNonNull(byte[] data);
+    abstract T convertNonNull(byte[] data);
 
-    public abstract byte[] convertNonNull(T object);
+    abstract byte[] convertNonNull(T object);
 }

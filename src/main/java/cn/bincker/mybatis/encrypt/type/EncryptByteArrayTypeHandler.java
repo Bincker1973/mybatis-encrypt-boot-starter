@@ -3,15 +3,19 @@ package cn.bincker.mybatis.encrypt.type;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class EncryptByteArrayTypeHandler<T> extends BaseTypeHandler<T> {
     @Override
-    public void setNonNullParameter(PreparedStatement ps, int i, Object parameter, JdbcType jdbcType) {
-        throw new UnsupportedOperationException("this TypeHandler does not support this operation.");
+    public void setNonNullParameter(PreparedStatement ps, int i, Object parameter, JdbcType jdbcType) throws SQLException {
+        if (parameter == null){
+            ps.setNull(i, Types.BINARY);
+            return;
+        }
+        if (!parameter.getClass().equals(byte[].class)){
+            throw new SQLException("parameter must be byte[] type.");
+        }
+        ps.setBytes(i, (byte[]) parameter);
     }
 
     @Override

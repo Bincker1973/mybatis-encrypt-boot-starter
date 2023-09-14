@@ -5,4 +5,4 @@ spring:
     password: 123456
 logging:
   level:
-    cn.bincker.mybatis.plus.encrypt.entity: DEBUG
+    cn.bincker.mybatis.plus.encrypt.mapper: DEBUG

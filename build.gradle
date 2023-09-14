@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
-    implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.3'
+    implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.3.2'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-autoconfigure:3.0.1'
     implementation 'net.bytebuddy:byte-buddy'
     implementation 'org.projectlombok:lombok'

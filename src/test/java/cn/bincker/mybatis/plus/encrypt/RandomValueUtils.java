@@ -61,6 +61,10 @@ public class RandomValueUtils {
             return Year.of(random.nextInt(0, 50000));
         } else if (cls.equals(YearMonth.class)) {
             return YearMonth.of(random.nextInt(0, 50000), random.nextInt(1, 13));
+        } else if (cls.equals(byte[].class)) {
+            byte[] result = new byte[64];
+            random.nextBytes(result);
+            return result;
         }else{
             throw new IllegalArgumentException("type: " + cls);
         }

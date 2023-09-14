@@ -1,6 +1,8 @@
 package cn.bincker.mybatis.plus.encrypt.entity;
 
 import cn.bincker.mybatis.encrypt.annotation.Encrypt;
+import cn.bincker.mybatis.encrypt.type.EncryptByteArrayTypeHandler;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -109,4 +111,7 @@ public class Demo {
     @Encrypt
     private YearMonth yearMonthField;
 
+    @Encrypt
+    @TableField(typeHandler = EncryptByteArrayTypeHandler.class)
+    private byte[] byteArrayField;
 }

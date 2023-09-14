@@ -66,13 +66,16 @@ public class MybatisEncryptAutoConfiguration {
     @Bean
     @ConditionalOnClass(com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer.class)
     public com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer encryptMybatisPlusCustomizer(EncryptExecutor encryptExecutor){
-        return configuration -> configure(configuration, encryptExecutor);
+        return configuration -> {
+            configure(configuration, encryptExecutor);
+            EncryptTypeHandlerConfigurator.configureWithMybatisPlus(configuration, encryptExecutor);
+        };
     }
 
     private void configure(org.apache.ibatis.session.Configuration configuration, EncryptExecutor encryptExecutor){
         configuration.setObjectWrapperFactory(new EncryptObjectWrapperFactory(encryptExecutor));
         configuration.setObjectFactory(new EncryptObjectFactory());
         configuration.setReflectorFactory(new EncryptReflectorFactory());
-        EncryptTypeHandlerConfigurator.configure(configuration);
+        EncryptTypeHandlerConfigurator.configure(configuration, encryptExecutor);
     }
 }
