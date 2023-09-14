@@ -1,4 +1,4 @@
-package cn.bincker.mybatis.plus.encrypt.entity;
+package entity;
 
 import cn.bincker.mybatis.encrypt.annotation.Encrypt;
 import cn.bincker.mybatis.encrypt.type.EncryptByteArrayTypeHandler;

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.bincker.mybatis.plus.encrypt.mapper.DemoMapper">
+  <select id="queryByBooleanTypeField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where boolean_type_field = #{booleanTypeField}
+  </select>
+  <select id="queryByBooleanField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where boolean_field = #{booleanField}
+  </select>
+  <select id="queryByByteTypeField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where byte_type_field = #{byteTypeField}
+  </select>
+  <select id="queryByByteField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where byte_field = #{byteField}
+  </select>
+  <select id="queryByShortTypeField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where short_type_field = #{shortTypeField}
+  </select>
+  <select id="queryByShortField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where short_field = #{shortField}
+  </select>
+  <select id="queryByIntegerField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where integer_field = #{integerField}
+  </select>
+  <select id="queryByIntField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where int_field = #{intField}
+  </select>
+  <select id="queryByLongTypeField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where long_type_field = #{longTypeField}
+  </select>
+  <select id="queryByLongField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where long_field = #{longField}
+  </select>
+  <select id="queryByFloatTypeField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where float_type_field = #{floatTypeField}
+  </select>
+  <select id="queryByFloatField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where float_field = #{floatField}
+  </select>
+  <select id="queryByDoubleTypeField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where double_type_field = #{doubleTypeField}
+  </select>
+  <select id="queryByDoubleField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where double_field = #{doubleField}
+  </select>
+  <select id="queryByStringField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where string_field = #{stringField}
+  </select>
+  <select id="queryByBigIntegerField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where big_integer_field = #{bigIntegerField}
+  </select>
+  <select id="queryByBigDecimalField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where big_decimal_field = #{bigDecimalField}
+  </select>
+  <select id="queryByDateTypeField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where date_type_field = #{dateTypeField}
+  </select>
+  <select id="queryByDateField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where date_field = #{dateField}
+  </select>
+  <select id="queryByTimeField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where time_field = #{timeField}
+  </select>
+  <select id="queryByTimestampField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where timestamp_field = #{timestampField}
+  </select>
+  <select id="queryByInstantField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where instant_field = #{instantField}
+  </select>
+  <select id="queryByLocalDateTimeField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where local_date_time_field = #{localDateTimeField}
+  </select>
+  <select id="queryByLocalDateField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where local_date_field = #{localDateField}
+  </select>
+  <select id="queryByLocalTimeField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where local_time_field = #{localTimeField}
+  </select>
+  <select id="queryByOffsetDateTimeField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where offset_date_time_field = #{offsetDateTimeField}
+  </select>
+  <select id="queryByOffsetTimeField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where offset_time_field = #{offsetTimeField}
+  </select>
+  <select id="queryByZonedDateTimeField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where zoned_date_time_field = #{zonedDateTimeField}
+  </select>
+  <select id="queryByMonthField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where month_field = #{monthField}
+  </select>
+  <select id="queryByYearField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where year_field = #{yearField}
+  </select>
+  <select id="queryByYearMonthField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where year_month_field = #{yearMonthField}
+  </select>
+  <select id="queryByByteArrayField" resultType="cn.bincker.mybatis.plus.encrypt.entity.Demo">
+    select * from public.demo where byte_array_field = #{byteArrayField}
+  </select>
+</mapper>

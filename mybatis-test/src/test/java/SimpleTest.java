@@ -1,5 +1,3 @@
-package cn.bincker.mybatis.plus.encrypt;
-
 import cn.bincker.mybatis.encrypt.type.EncryptParam;
 import cn.bincker.mybatis.plus.encrypt.entity.Demo;
 import cn.bincker.mybatis.plus.encrypt.mapper.DemoMapper;
