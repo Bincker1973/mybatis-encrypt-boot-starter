@@ -23,3 +23,14 @@ Mybatis数据加解密模块
 - 加密字段在数据库中需要为Bytea类型
 - 加密字段无法在查询中进行计算，只能进行eq查询
 - 需要通过加密字段进行查询时，参数必须为实体类或EncryptParam和LambdaEncryptParam
+
+## 进度
+✔ 实现加密基础框架  
+✔ AES默认实现  
+✔ 数据插入加密  
+✔ 单个字段数据查询  
+✔ Mybatis Plus数据查询  
+✔ Mybatis Plus Lambda数据查询  
+× 数据更新测试  
+× 数据完整性校验  
+× Mybatis测试  
